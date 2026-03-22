@@ -8,6 +8,7 @@ export const useReadErc20 = () =>{
     const [isLoadingMaxSupply, setIsLoadingMaxSupply] = useState(false);
     const [isLoadingReqTok, setIsLoadingReqTok] = useState(false);
     const [isLoadingClaimInterval, setIsLoadingClaimInterval] = useState(false);
+    const [isLoadingOwner, setIsLoadingOwner] = useState(false);
 
     const getTotalSupply = useCallback(async(): Promise<bigint | null> =>{
         
@@ -77,5 +78,21 @@ export const useReadErc20 = () =>{
         }
     },[erc20Contract])
 
-    return {isLoadingTotalSupply,isLoadingMaxSupply,getTotalSupply,getMaxSupply,getTokenPerReq,isLoadingReqTok,getClaimInterval,isLoadingClaimInterval};
+    const getOwner = useCallback(async(): Promise<string | null> =>{
+        if(!erc20Contract){
+            toast.error("ERC20 Contract Not Found");
+            return null;
+        }
+        try{
+            setIsLoadingOwner(true);
+            const owner = await erc20Contract.owner();
+            return owner;
+        }catch(error){
+            return null;
+        }finally{
+            setIsLoadingOwner(false);
+        }
+    },[erc20Contract])
+
+    return {isLoadingTotalSupply,isLoadingMaxSupply,getTotalSupply,getMaxSupply,getTokenPerReq,isLoadingReqTok,getClaimInterval,isLoadingClaimInterval,getOwner,isLoadingOwner};
 }

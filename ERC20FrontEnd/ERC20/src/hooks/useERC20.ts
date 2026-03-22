@@ -20,22 +20,22 @@ export const useERC20 = () =>{
     const [claimInterval, setClaimInterval] = useState<bigint | null>(null);
     const {getMaxSupply, getTotalSupply, getTokenPerReq, getClaimInterval} = useReadErc20();
 
+    const refreshContractData = useCallback(async()=>{
+        const [totSupply, totMaxSupply, userTok, interval] = await Promise.all([
+            getTotalSupply(),
+            getMaxSupply(),
+            getTokenPerReq(),
+            getClaimInterval(),
+        ]);
+        setTotalSup(totSupply);
+        setTotalMaxSup(totMaxSupply);
+        setTokenPerReq(userTok);
+        setClaimInterval(interval);
+    },[getTotalSupply, getMaxSupply,getTokenPerReq,getClaimInterval]);
 
     useEffect(()=>{
-        const getAll = async()=>{
-            const [totSupply, totMaxSupply, userTok, interval] = await Promise.all([
-                getTotalSupply(),
-                getMaxSupply(),
-                getTokenPerReq(),
-                getClaimInterval(),
-            ]);
-            setTotalSup(totSupply);
-            setTotalMaxSup(totMaxSupply);
-            setTokenPerReq(userTok);
-            setClaimInterval(interval);
-        }
-        getAll();
-    },[getTotalSupply, getMaxSupply,getTokenPerReq,getClaimInterval])
+        refreshContractData();
+    },[refreshContractData])
 
 
     const mintToken = useCallback(async()=>{
@@ -54,17 +54,19 @@ export const useERC20 = () =>{
         const isMintSuccessful = await mintSomeToken(parsedAmount);
         if(!isMintSuccessful) return;
 
+        await refreshContractData();
         setInputAmount("");
-    },[inputAmount, mintSomeToken]);
+    },[inputAmount, mintSomeToken, refreshContractData]);
 
     const reqToken = useCallback(async(): Promise<boolean>=>{
         setError("");
         const isRequestSuccessful= await requestToken();
         if(!isRequestSuccessful) return false;
+        await refreshContractData();
         return true;
-    },[requestToken]);
+    },[requestToken, refreshContractData]);
 
-    return {inputAmount,amount,setInputAmount,error,setError,mintToken,setAmount, totalMaxSup, totalSup,reqToken,tokPerReq,claimInterval}
+    return {inputAmount,amount,setInputAmount,error,setError,mintToken,setAmount, totalMaxSup, totalSup,reqToken,tokPerReq,claimInterval,refreshContractData}
 }
 
 // export interface ReqTok{
