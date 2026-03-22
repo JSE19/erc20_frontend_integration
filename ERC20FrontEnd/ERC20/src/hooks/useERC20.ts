@@ -1,9 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import { useWriteERC20 } from "./specific/useWriteERC20";
-import {useReadERC20} from "./specific/useReadERC20"
-
-import {toast} from "react-toastify";
+import {useReadErc20} from "./specific/useReadERC20"
 
 
 export interface Mint{
@@ -15,6 +13,29 @@ export const useERC20 = () =>{
     const [inputAmount, setInputAmount] = useState("");
     const [error, setError] = useState("");
     const {mintSomeToken} = useWriteERC20();
+    const {requestToken} =useWriteERC20();
+    const [totalSup, setTotalSup] = useState<bigint | null>(null);
+    const [totalMaxSup, setTotalMaxSup] = useState<bigint | null>(null);
+    const [tokPerReq,setTokenPerReq] = useState<bigint | null>(null);
+    const [claimInterval, setClaimInterval] = useState<bigint | null>(null);
+    const {getMaxSupply, getTotalSupply, getTokenPerReq, getClaimInterval} = useReadErc20();
+
+
+    useEffect(()=>{
+        const getAll = async()=>{
+            const [totSupply, totMaxSupply, userTok, interval] = await Promise.all([
+                getTotalSupply(),
+                getMaxSupply(),
+                getTokenPerReq(),
+                getClaimInterval(),
+            ]);
+            setTotalSup(totSupply);
+            setTotalMaxSup(totMaxSupply);
+            setTokenPerReq(userTok);
+            setClaimInterval(interval);
+        }
+        getAll();
+    },[getTotalSupply, getMaxSupply,getTokenPerReq,getClaimInterval])
 
 
     const mintToken = useCallback(async()=>{
@@ -36,9 +57,14 @@ export const useERC20 = () =>{
         setInputAmount("");
     },[inputAmount, mintSomeToken]);
 
-    const requestToken = useCallback(async()=>{},[])
+    const reqToken = useCallback(async(): Promise<boolean>=>{
+        setError("");
+        const isRequestSuccessful= await requestToken();
+        if(!isRequestSuccessful) return false;
+        return true;
+    },[requestToken]);
 
-    return {inputAmount,amount,setInputAmount,error,setError,mintToken,setAmount}
+    return {inputAmount,amount,setInputAmount,error,setError,mintToken,setAmount, totalMaxSup, totalSup,reqToken,tokPerReq,claimInterval}
 }
 
 // export interface ReqTok{

@@ -5,16 +5,12 @@ import {
 } from "react-icons/fi";
 
 import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
-import { useERC20,type Mint } from "../hooks/useERC20";
-import { formatAddress } from "../util";
-//import { useState } from "react";
+import { useERC20 } from "../hooks/useERC20";
+import { formatAddress, formatTokenAmount } from "../util";
 import { useWriteERC20 } from "../hooks/specific/useWriteERC20";
 
-
-
 const Admin = () => {
-
-  const {inputAmount,amount,setInputAmount,error,setError,mintToken,setAmount} = useERC20();
+  const {inputAmount,setInputAmount,error,mintToken, totalSup, totalMaxSup} = useERC20();
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) =>{
     if(e.key === "Enter") mintToken();
@@ -116,17 +112,17 @@ const Admin = () => {
               <p className="mb-3 text-gray-600 text-xs font-black uppercase tracking-widest">Supply Stats</p>
               <p className="text-gray-700 text-sm">Total Supply</p>
               <div className="mt-4 flex items-baseline gap-2">
-                <strong className="text-3xl text-gray-900">1,240,000</strong>
-                <span className="text-gray-600">ETHL</span>
+                <strong className="text-3xl text-gray-900">{formatTokenAmount(totalSup)}</strong>
+                <span className="text-gray-600">RAJ</span>
               </div>
 
               <div className="mt-5 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <span className="block h-full w-1/2 bg-gradient-to-r from-blue-500 to-purple-500" />
+                {/* <span className="block h-full w-1/2 bg-gradient-to-r from-blue-500 to-purple-500" /> */}
               </div>
 
               <div className="mt-3 flex justify-between text-xs text-gray-600">
-                <span>Minted (55%)</span>
-                <span>Cap (10M)</span>
+                {/* <span>Minted (55%)</span>
+                <span>Cap (10M)</span> */}
               </div>
             </article>
 
@@ -134,17 +130,17 @@ const Admin = () => {
               <p className="mb-3 text-gray-600 text-xs font-black uppercase tracking-widest">Supply Stats</p>
               <p className="text-gray-700 text-sm">Max Supply</p>
               <div className="mt-4 flex items-baseline gap-2">
-                <strong className="text-3xl text-gray-900">1,240,000</strong>
-                <span className="text-gray-600">ETHL</span>
+                <strong className="text-3xl text-gray-900">{formatTokenAmount(totalMaxSup)}</strong>
+                <span className="text-gray-600">RAJ</span>
               </div>
 
               <div className="mt-5 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <span className="block h-full w-1/2 bg-gradient-to-r from-blue-500 to-purple-500" />
+                {/* <span className="block h-full w-1/2 bg-gradient-to-r from-blue-500 to-purple-500" /> */}
               </div>
 
               <div className="mt-3 flex justify-between text-xs text-gray-600">
-                <span>Minted (55%)</span>
-                <span>Cap (10M)</span>
+                {/* <span>Minted (55%)</span>
+                <span>Cap (10M)</span> */}
               </div>
             </article>
           </div>

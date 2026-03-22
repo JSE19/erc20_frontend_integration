@@ -1,15 +1,13 @@
-import { useAppKitAccount } from "@reown/appkit/react";
 import { useERC20Contract } from "../useContract";
 import { useState, useCallback } from "react";
 import {toast} from "react-toastify";
-// import { Mint } from "../useERC20";
-// import type { Numeric } from "ethers";
 
 export const useReadErc20 = () =>{
     const erc20Contract = useERC20Contract();
-    //const {address} = useAppKitAccount();
     const [isLoadingTotalSupply, setIsLoadingTotalSupply] = useState(false);
     const [isLoadingMaxSupply, setIsLoadingMaxSupply] = useState(false);
+    const [isLoadingReqTok, setIsLoadingReqTok] = useState(false);
+    const [isLoadingClaimInterval, setIsLoadingClaimInterval] = useState(false);
 
     const getTotalSupply = useCallback(async(): Promise<bigint | null> =>{
         
@@ -31,7 +29,7 @@ export const useReadErc20 = () =>{
     const getMaxSupply = useCallback(async(): Promise<bigint | null> =>{
         if(!erc20Contract){
             toast.error("ERC20 Contract Not Found");
-            return;
+            return null;
         }
         try{
             setIsLoadingMaxSupply(true);
@@ -44,5 +42,40 @@ export const useReadErc20 = () =>{
         }
     },[erc20Contract]);
 
-    return {isLoadingTotalSupply,isLoadingMaxSupply,getTotalSupply,getMaxSupply};
+    const getTokenPerReq = useCallback(async(): Promise<bigint | null>=>{
+        if(!erc20Contract){
+            toast.error("ERC20 Contract Not Found");
+            return null;
+
+        }
+        try{
+            setIsLoadingReqTok(true);
+            const userTokePerReq = await erc20Contract.FAUCET_AMT();
+            return userTokePerReq;
+        }
+        catch(error){
+            return null
+        }
+        finally{
+            setIsLoadingReqTok(false)
+        }
+    },[erc20Contract])
+
+    const getClaimInterval = useCallback(async(): Promise<bigint | null> =>{
+        if(!erc20Contract){
+            toast.error("ERC20 Contract Not Found");
+            return null;
+        }
+        try{
+            setIsLoadingClaimInterval(true);
+            const claimInterval = await erc20Contract.CLAIM_INTERVAL();
+            return claimInterval;
+        }catch(error){
+            return null;
+        }finally{
+            setIsLoadingClaimInterval(false);
+        }
+    },[erc20Contract])
+
+    return {isLoadingTotalSupply,isLoadingMaxSupply,getTotalSupply,getMaxSupply,getTokenPerReq,isLoadingReqTok,getClaimInterval,isLoadingClaimInterval};
 }
